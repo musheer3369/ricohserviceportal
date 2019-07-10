@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category>custom</category>
+        <client_script><![CDATA[function() {
+  /* widget controller */
+  var c = this;
+	alert($.ajax());
+	 var getEmbedToken = "https://mindshiftpowerbi.azurewebsites.net/api/PowerBIHttpTrigger?code=QvgqsUVSBrxTu68P5inNO/GK1LjOQ3J4gcUamvsgRETS8ZG3ModOzA==";  
+  
+          var  IamAFilter = {	$schema: "http://powerbi.com/product/schema#basic",
+  			target: {
+   			 table: "tbl_SNOW_Incidents",
+    			column: "company"
+  				},
+ 			 operator: "In",
+  			values: ["c00f0aa0dbde3200bd78f8621f96196b","89671564db5e3200bd78f8621f96192e"]
+}
+
+        $.ajax({  
+            url: getEmbedToken,  
+            jsonpCallback: 'callback',  
+            contentType: 'application/javascript',  
+            dataType: "jsonp",  
+            success: function (json) {  
+  
+                var models = window['powerbi-client'].models;  
+  
+                var embedConfiguration = {  
+                    type: 'report',  
+                    id: json.ReportId,  
+                    embedUrl: json.EmbedUrl,  
+                    filters:[IamAFilter],
+                    tokenType: models.TokenType.Embed,  
+                    accessToken: json.EmbedToken  ,
+			settings:{
+					filterPaneEnabled:false
+					}
+                };  
+  
+                var $reportContainer = $('#reportContainer');  
+                var report = powerbi.embed($reportContainer.get(0), embedConfiguration);  
+  
+  
+            },  
+            error: function () {  
+                alert("Error");  
+            }  
+        });  
+  
+}]]></client_script>
+        <controller_as>c</controller_as>
+        <css/>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description/>
+        <docs/>
+        <field_list/>
+        <has_preview>true</has_preview>
+        <id>rsp-power-bi-dashboard</id>
+        <internal>false</internal>
+        <link><![CDATA[function link(scope, element, attrs, controller) { 
+
+ }]]></link>
+        <name>RSP Power Bi Dashboard</name>
+        <option_schema/>
+        <public>false</public>
+        <roles/>
+        <script><![CDATA[(function() {
+  /* populate the 'data' object */
+  /* e.g., data.table = $sp.getValue('table'); */
+
+})();]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>Mohammad.Ahmed@mindshift.com</sys_created_by>
+        <sys_created_on>2019-07-10 05:56:15</sys_created_on>
+        <sys_customer_update>false</sys_customer_update>
+        <sys_id>c80567e5dbaefb0063599017db9619b1</sys_id>
+        <sys_mod_count>4</sys_mod_count>
+        <sys_name>RSP Power Bi Dashboard</sys_name>
+        <sys_package display_value="Ricoh Service Portal" source="x_mst_ricoh_servic">a8342b65dbaefb0063599017db961909</sys_package>
+        <sys_policy/>
+        <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+        <sys_scope display_value="Ricoh Service Portal">a8342b65dbaefb0063599017db961909</sys_scope>
+        <sys_update_name>sp_widget_c80567e5dbaefb0063599017db9619b1</sys_update_name>
+        <sys_updated_by>Mohammad.Ahmed@mindshift.com</sys_updated_by>
+        <sys_updated_on>2019-07-10 06:06:55</sys_updated_on>
+        <template><![CDATA[<div>
+<!-- your widget template -->
+   <h1>Power BI Embedded Demo</h1>  
+    <div id="reportContainer" style="width: 80%; height: 800px;"></div> 
+</div>]]></template>
+    </sp_widget>
+</record_update>
