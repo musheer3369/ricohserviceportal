@@ -4,17 +4,20 @@
         <client_script><![CDATA[function() {
   /* widget controller */
   var c = this;
-	alert($.ajax());
+	console.log(c.data.vAccounts);
 	 var getEmbedToken = "https://mindshiftpowerbi.azurewebsites.net/api/PowerBIHttpTrigger?code=QvgqsUVSBrxTu68P5inNO/GK1LjOQ3J4gcUamvsgRETS8ZG3ModOzA==";  
   
-          var  IamAFilter = {	$schema: "http://powerbi.com/product/schema#basic",
-  			target: {
-   			 table: "tbl_SNOW_Incidents",
-    			column: "company"
-  				},
- 			 operator: "In",
-  			values: ["c00f0aa0dbde3200bd78f8621f96196b","89671564db5e3200bd78f8621f96192e"]
-}
+	 var  companyFilter ={};
+	
+	  companyFilter = {	$schema: "http://powerbi.com/product/schema#basic",
+				target: {
+				table: "tbl_SNOW_Incidents",
+				column: "company_id"
+								},
+				 operator: "In",
+					values: c.data.vAccounts
+				}
+	
 
         $.ajax({  
             url: getEmbedToken,  
@@ -29,7 +32,7 @@
                     type: 'report',  
                     id: json.ReportId,  
                     embedUrl: json.EmbedUrl,  
-                    filters:[IamAFilter],
+                    filters:[companyFilter],
                     tokenType: models.TokenType.Embed,  
                     accessToken: json.EmbedToken  ,
 			settings:{
@@ -39,7 +42,7 @@
   
                 var $reportContainer = $('#reportContainer');  
                 var report = powerbi.embed($reportContainer.get(0), embedConfiguration);  
-  
+                    
   
             },  
             error: function () {  
@@ -68,6 +71,33 @@
         <script><![CDATA[(function() {
   /* populate the 'data' object */
   /* e.g., data.table = $sp.getValue('table'); */
+	
+	VisibleAccounts();
+
+	
+	function VisibleAccounts()
+	{
+		var vAccounts = [];
+		
+		var gr = new GlideRecord("core_company");
+		gr.addEncodedQuery("sys_domain!=global^ORsys_domain=NULL");
+	  gr.addEncodedQuery("active=true");
+	
+		gr.query();		
+		if(!gs.getUser().hasRole('itil')){
+			while(gr.next()){
+				vAccounts.push(gr.getDisplayValue("sys_id"));
+			}
+		}
+		else
+			{
+				vAccounts.push(gs.getUser().getCompanyID());
+			}
+		data.vAccounts = vAccounts;
+		console.log(vAccounts);
+		return gr.getRowCount();
+	}
+	
 
 })();]]></script>
         <servicenow>false</servicenow>
@@ -76,7 +106,7 @@
         <sys_created_on>2019-07-10 05:56:15</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>c80567e5dbaefb0063599017db9619b1</sys_id>
-        <sys_mod_count>4</sys_mod_count>
+        <sys_mod_count>44</sys_mod_count>
         <sys_name>RSP Power Bi Dashboard</sys_name>
         <sys_package display_value="Ricoh Service Portal" source="x_mst_ricoh_servic">a8342b65dbaefb0063599017db961909</sys_package>
         <sys_policy/>
@@ -84,11 +114,10 @@
         <sys_scope display_value="Ricoh Service Portal">a8342b65dbaefb0063599017db961909</sys_scope>
         <sys_update_name>sp_widget_c80567e5dbaefb0063599017db9619b1</sys_update_name>
         <sys_updated_by>Mohammad.Ahmed@mindshift.com</sys_updated_by>
-        <sys_updated_on>2019-07-10 06:06:55</sys_updated_on>
-        <template><![CDATA[<div>
-<!-- your widget template -->
-   <h1>Power BI Embedded Demo</h1>  
-    <div id="reportContainer" style="width: 80%; height: 800px;"></div> 
-</div>]]></template>
+        <sys_updated_on>2019-07-11 11:16:03</sys_updated_on>
+        <template><![CDATA[
+<!-- your widget template -->  
+    <div id="reportContainer" style="width:100%; height:800px" ></div> 
+]]></template>
     </sp_widget>
 </record_update>
