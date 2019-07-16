@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category>custom</category>
+        <client_script><![CDATA[function() {
+  /* widget controller */
+  var c = this;
+	console.log(c.data.vAccounts);
+	 var getEmbedToken = 
+			 "https://callvolumemetrics.azurewebsites.net/api/CallVolumeHttpTrigger?code=XmT4UxkubzWdBSvF6lH1fqxg68KGJUUhO/akVztqfoxKbmVW6xGPiQ==";  
+  
+	 var  companyFilter ={};
+	
+	  companyFilter = {	$schema: "http://powerbi.com/product/schema#basic",
+				target: {
+				table: "tbl_SNOW_core_company",
+				column: "u_site_id"
+								},
+				 operator: "In",
+					values: c.data.vAccounts
+				}
+	
+
+        $.ajax({  
+            url: getEmbedToken,  
+            jsonpCallback: 'callback',  
+            contentType: 'application/javascript',  
+            dataType: "jsonp",  
+            success: function (json) {  
+  
+                var models = window['powerbi-client'].models;  
+  
+                var embedConfiguration = {  
+                    type: 'report',  
+                    id: json.ReportId,  
+                    embedUrl: json.EmbedUrl,  
+                    filters:[companyFilter],
+                    tokenType: models.TokenType.Embed,  
+                    accessToken: json.EmbedToken  ,
+			settings:{
+					filterPaneEnabled:false
+					}
+                };  
+  
+                var $reportContainer = $('#reportContainer');  
+                var report = powerbi.embed($reportContainer.get(0), embedConfiguration);  
+                    
+  
+            },  
+            error: function () {  
+                alert("Error");  
+            }  
+        });  
+  
+}]]></client_script>
+        <controller_as>c</controller_as>
+        <css/>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description/>
+        <docs/>
+        <field_list/>
+        <has_preview>true</has_preview>
+        <id>rsp-power-bi-dashboard2</id>
+        <internal>false</internal>
+        <link><![CDATA[function link(scope, element, attrs, controller) { 
+
+ }]]></link>
+        <name>RSP Power Bi Dashboard2</name>
+        <option_schema/>
+        <public>false</public>
+        <roles/>
+        <script><![CDATA[(function() {
+  /* populate the 'data' object */
+  /* e.g., data.table = $sp.getValue('table'); */
+	
+	VisibleAccounts();
+
+	
+	function VisibleAccounts()
+	{
+		var vAccounts = [];		
+		var gr = new GlideRecord("core_company");
+		gr.addEncodedQuery("sys_domain!=global^ORsys_domain=NULL");
+	  gr.addEncodedQuery("active=true");
+	
+		gr.query();		
+		if(!gs.getUser().hasRole('itil')){
+			while(gr.next()){
+				vAccounts.push(gr.getDisplayValue("u_site_id"));
+			}
+		}
+		else
+			{
+				var company = new GlideRecord('core_company');
+				company.get(gs.getUser().getCompanyID());
+				console.log('here');
+				console.log(company.getValue('sys_id'));
+				vAccounts.push(company.getDisplayValue('u_site_id'));
+				
+			}
+		data.vAccounts = vAccounts;
+		console.log(vAccounts);
+		return gr.getRowCount();
+	}
+	
+
+})();]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>Mohammad.Ahmed@mindshift.com</sys_created_by>
+        <sys_created_on>2019-07-16 06:45:21</sys_created_on>
+        <sys_customer_update>false</sys_customer_update>
+        <sys_id>1ae96eebdb6e3f4063599017db961907</sys_id>
+        <sys_mod_count>14</sys_mod_count>
+        <sys_name>RSP Power Bi Dashboard2</sys_name>
+        <sys_package display_value="Ricoh Service Portal" source="x_mst_ricoh_servic">a8342b65dbaefb0063599017db961909</sys_package>
+        <sys_policy/>
+        <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+        <sys_scope display_value="Ricoh Service Portal">a8342b65dbaefb0063599017db961909</sys_scope>
+        <sys_update_name>sp_widget_1ae96eebdb6e3f4063599017db961907</sys_update_name>
+        <sys_updated_by>Mohammad.Ahmed@mindshift.com</sys_updated_by>
+        <sys_updated_on>2019-07-16 07:09:13</sys_updated_on>
+        <template><![CDATA[
+<!-- your widget template -->  
+    <div id="reportContainer" style="width:100%; height:800px" ></div> 
+]]></template>
+    </sp_widget>
+</record_update>
