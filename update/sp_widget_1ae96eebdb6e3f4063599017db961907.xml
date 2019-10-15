@@ -1,10 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?><record_update table="sp_widget">
     <sp_widget action="INSERT_OR_UPDATE">
         <category>custom</category>
-        <client_script><![CDATA[function() {
+        <client_script><![CDATA[function($scope) {
   /* widget controller */
   var c = this;
-	console.log(c.data.vAccounts);
+	
+	$scope.init = function(){
+	;
+	};	
+	$scope.fullscreen = function() {
+		
+		 
+        // Get a reference to the embedded report HTML element
+        var embedContainer = $('#reportContainer')[0];
+
+        // Get a reference to the embedded report.
+        report = powerbi.get(embedContainer);
+
+        // Displays the report in full screen mode.
+        report.fullscreen();
+    }
+	
+
 	 var getEmbedToken = 
 			 "https://mscustomerpbireporting.azurewebsites.net/api/CPBRHttpTrigger1?code=VqaHtvISt0hXYGTM8YMWvbGUQ7uzL7FpH8O8cokHtsxfdcjKf7ptzw==";  
   
@@ -17,9 +34,22 @@
 								},
 				 operator: "In",
 					values: c.data.vAccounts
-				}
-	
-
+				};
+	/*
+	  var defaultDateFilter={};
+	         defaultDateFilter=     {
+				  $schema: "http://powerbi.com/product/schema#relativeDate",
+				  target: {
+					table: "Calendar",
+					column: "Date"
+				  },
+				  operator: "InLast",
+				  timeUnitsCount: 30,
+				  timeUnitType: "Days",
+				  includeToday: true,
+				  filterType: 4 
+				};
+*/
         $.ajax({  
             url: getEmbedToken,  
             jsonpCallback: 'callback',  
@@ -33,12 +63,9 @@
                 var embedConfiguration = {  
                     type: 'report',  
                     id: json.ReportId,  
-                    embedUrl: json.EmbedUrl,  
+                    embedUrl: json.EmbedUrl,  									
                     filters:[companyFilter],
-                    tokenType: models.TokenType.Embed,  
-					layoutType: models.LayoutType.Custom,
-  customLayout: {
-    displayOption: models.DisplayOption.FitToPage},
+                    tokenType: models.TokenType.Embed,
                     accessToken: json.EmbedToken  ,
 			settings:{
 					filterPaneEnabled:false
@@ -46,22 +73,21 @@
                 };  
   
                 var $reportContainer = $('#reportContainer');  
-                var report = powerbi.embed($reportContainer.get(0), embedConfiguration);  
-                    
-  
+                var report = powerbi.embed($reportContainer.get(0), embedConfiguration);                   
+                    $reportContainer.height($("main").height()  );
             },  
             error: function () {  
                 alert("Error");  
             }  
         });  
+	
+	
+
+
   
 }]]></client_script>
         <controller_as>c</controller_as>
-        <css>.rpt-container{&#13;
-height:700px;&#13;
-  width:100%;&#13;
-&#13;
-}</css>
+        <css/>
         <data_table>sp_instance</data_table>
         <demo_data/>
         <description/>
@@ -107,7 +133,7 @@ height:700px;&#13;
 				
 			}
 		data.vAccounts = vAccounts;
-		console.log(vAccounts);
+		
 		return gr.getRowCount();
 	}
 	
@@ -119,7 +145,7 @@ height:700px;&#13;
         <sys_created_on>2019-07-16 06:45:21</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>1ae96eebdb6e3f4063599017db961907</sys_id>
-        <sys_mod_count>55</sys_mod_count>
+        <sys_mod_count>105</sys_mod_count>
         <sys_name>RSP Power Bi Dashboard2</sys_name>
         <sys_package display_value="Ricoh Service Portal" source="x_mst_ricoh_servic">a8342b65dbaefb0063599017db961909</sys_package>
         <sys_policy/>
@@ -127,9 +153,9 @@ height:700px;&#13;
         <sys_scope display_value="Ricoh Service Portal">a8342b65dbaefb0063599017db961909</sys_scope>
         <sys_update_name>sp_widget_1ae96eebdb6e3f4063599017db961907</sys_update_name>
         <sys_updated_by>Mohammad.Ahmed@mindshift.com</sys_updated_by>
-        <sys_updated_on>2019-10-07 07:23:46</sys_updated_on>
-        <template><![CDATA[<!-- your widget template -->  
-    <div id="reportContainer"  class="rpt-container" ></div> 
+        <sys_updated_on>2019-10-11 05:32:09</sys_updated_on>
+        <template><![CDATA[
+	<div id="reportContainer"></div>
 ]]></template>
     </sp_widget>
 </record_update>
