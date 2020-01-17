@@ -5,93 +5,75 @@
   /* widget controller */
   var c = this;
 	
-	$scope.init = function(){
-	;
-	};	
+	
 	$scope.fullscreen = function() {
-		
-		 
         // Get a reference to the embedded report HTML element
         var embedContainer = $('#reportContainer')[0];
-
         // Get a reference to the embedded report.
         report = powerbi.get(embedContainer);
-
         // Displays the report in full screen mode.
         report.fullscreen();
-    }
+    };
 	
-
-	 var getEmbedToken = 
+	var getEmbedToken = 
 			 "https://mscustomerpbireporting.azurewebsites.net/api/CPBRHttpTrigger1?code=VqaHtvISt0hXYGTM8YMWvbGUQ7uzL7FpH8O8cokHtsxfdcjKf7ptzw==";  
   
 	 var  companyFilter ={};
-	
 	  companyFilter = {	$schema: "http://powerbi.com/product/schema#basic",
 				target: {
-				table: "tbl_SNOW_core_company",
+					table: "tbl_SNOW_core_company",
 				column: "sys_id"
 								},
 				 operator: "In",
-					values: c.data.vAccounts
-				};
-	/*
-	  var defaultDateFilter={};
-	         defaultDateFilter=     {
-				  $schema: "http://powerbi.com/product/schema#relativeDate",
-				  target: {
-					table: "Calendar",
-					column: "Date"
-				  },
-				  operator: "InLast",
-				  timeUnitsCount: 30,
-				  timeUnitType: "Days",
-				  includeToday: true,
-				  filterType: 4 
-				};
-*/
+					values: c.data.vAccounts		  			
+		};
+	
         $.ajax({  
             url: getEmbedToken,  
-            jsonpCallback: 'callback',  
-			pageName:"Overview",
+            jsonpCallback: 'callback',			
             contentType: 'application/javascript',  
             dataType: "jsonp", 
 			beforeSend:function(){
 				$scope.loadingData = true;
 			},
             success: function (json) {  
-  
-                var models = window['powerbi-client'].models;  
+			             console.log(json);
+                var models = window['powerbi-client'].models;   
   
                 var embedConfiguration = {  
-                    type: 'report',  
-                    id: json.ReportId,  
-                    embedUrl: json.EmbedUrl,  									
-                    filters:[companyFilter],
+									type:"report",  
+					pageName:"ReportSection",
+					          id: json.ReportId,  
+                    embedUrl: json.EmbedUrl,									                   
                     tokenType: models.TokenType.Embed,
+									filters:[companyFilter],									
                     accessToken: json.EmbedToken  ,
 			settings:{
 					filterPaneEnabled:false
 					}
-                };  
-  
-                var $reportContainer = $('#reportContainer');  
-                var report = powerbi.embed($reportContainer.get(0), embedConfiguration);                   
-                    $reportContainer.height($("main").height()  );
+                };    
+        var $reportContainer = $('#reportContainer');  
+        var report = powerbi.embed($reportContainer.get(0), embedConfiguration);        
+        $reportContainer.height($("main").height() );
+						
             },
 			complete:function(data){
 				$scope.loadingData = false;
+				console.log("complete");	
 			},  
-            error: function () {  
+            error: function (e) {  
+				   console.log("Error:" + e.message)
                 alert("Error");  
             }  
         });  
 	
+
 	
+}
 
 
   
-}]]></client_script>
+]]></client_script>
         <controller_as>c</controller_as>
         <css/>
         <data_table>sp_instance</data_table>
@@ -114,8 +96,6 @@
   /* e.g., data.table = $sp.getValue('table'); */
 	
 	VisibleAccounts();
-
-	
 	function VisibleAccounts()
 	{
 		var vAccounts = [];		
@@ -151,7 +131,7 @@
         <sys_created_on>2019-07-16 06:45:21</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>1ae96eebdb6e3f4063599017db961907</sys_id>
-        <sys_mod_count>108</sys_mod_count>
+        <sys_mod_count>177</sys_mod_count>
         <sys_name>RSP Power Bi Dashboard2</sys_name>
         <sys_package display_value="Ricoh Service Portal" source="x_mst_ricoh_servic">a8342b65dbaefb0063599017db961909</sys_package>
         <sys_policy/>
@@ -159,7 +139,7 @@
         <sys_scope display_value="Ricoh Service Portal">a8342b65dbaefb0063599017db961909</sys_scope>
         <sys_update_name>sp_widget_1ae96eebdb6e3f4063599017db961907</sys_update_name>
         <sys_updated_by>Mohammad.Ahmed@mindshift.com</sys_updated_by>
-        <sys_updated_on>2019-11-19 12:10:20</sys_updated_on>
+        <sys_updated_on>2020-01-16 04:55:38</sys_updated_on>
         <template><![CDATA[<div class="alert alert-info" ng-if="loadingData">
   <fa name="spinner" spin="true"></fa>  Loading Reports...
 </div>
