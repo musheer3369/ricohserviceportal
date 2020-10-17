@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_row">
+    <sp_row action="INSERT_OR_UPDATE">
+        <class_name/>
+        <order>1</order>
+        <sp_column/>
+        <sp_container display_value="RSP Sentinel One Reports - Container 1">997c562fdbab9cd07fae62cb139619c6</sp_container>
+        <sys_class_name>sp_row</sys_class_name>
+        <sys_created_by>Mohammad.Ahmed@mindshift.com</sys_created_by>
+        <sys_created_on>2020-10-05 15:11:58</sys_created_on>
+        <sys_customer_update>false</sys_customer_update>
+        <sys_id>ad8c562fdbab9cd07fae62cb1396199f</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>1</sys_name>
+        <sys_package display_value="Ricoh Service Portal" source="x_mst_ricoh_servic">a8342b65dbaefb0063599017db961909</sys_package>
+        <sys_policy/>
+        <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+        <sys_scope display_value="Ricoh Service Portal">a8342b65dbaefb0063599017db961909</sys_scope>
+        <sys_update_name>sp_row_ad8c562fdbab9cd07fae62cb1396199f</sys_update_name>
+        <sys_updated_by>Mohammad.Ahmed@mindshift.com</sys_updated_by>
+        <sys_updated_on>2020-10-05 15:11:58</sys_updated_on>
+    </sp_row>
+</record_update>

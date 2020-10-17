@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category>custom</category>
+        <client_script><![CDATA[function($scope) {
+  /* widget controller */
+  var c = this;
+	
+	
+	$scope.fullscreen = function() {
+        // Get a reference to the embedded report HTML element
+        var embedContainer = $('#reportContainer')[0];
+        // Get a reference to the embedded report.
+        report = powerbi.get(embedContainer);
+        // Displays the report in full screen mode.
+        report.fullscreen();
+    };
+	
+	var getEmbedToken = 
+			 "https://sentinelonepbi.azurewebsites.net/api/SentinelOneHttpTrigger?code=H/965nZZzbOa8mYqJi/YMBeBvTRqjVE0serARQ/oe143mx06MC6NxQ==";  
+  
+	 var  companyFilter ={};
+	  companyFilter = {	$schema: "http://powerbi.com/product/schema#basic",
+				target: {
+					table: "Accounts",
+				column: "Accounts.id"
+								},
+				 operator: "In",
+					values:c.data.vAccounts // ['SLF - Sellers Dorsey and Associates']//			
+		};
+	
+	
+	//'768143773015883658'
+	
+	var  test ={};
+	  test = {	$schema: "http://powerbi.com/product/schema#basic",
+				target: {
+					table: "Accounts",
+				column: "Accounts.name"
+								},
+				 operator: "In",
+					//	values:['768143773015883658']
+					values: ['SLF - Sellers Dorsey and Associates']	
+		};
+		console.log(companyFilter);
+	
+        $.ajax({  
+            url: getEmbedToken,  
+            jsonpCallback: 'callback',			
+            contentType: 'application/javascript',  
+            dataType: "jsonp", 
+			beforeSend:function(){
+				$scope.loadingData = true;
+			},
+            success: function (json) {  
+			             console.log(json);
+                var models = window['powerbi-client'].models;   
+  
+                var embedConfiguration = {  
+									type:"report",  
+					//pageName:"ReportSection",
+					          id: json.ReportId,  
+                    embedUrl: json.EmbedUrl,									                   
+                    tokenType: models.TokenType.Embed,
+									filters:[companyFilter],									
+                    accessToken: json.EmbedToken  ,
+			settings:{
+					filterPaneEnabled:false
+					}
+                };    
+        var $reportContainer = $('#reportContainer');  
+        var report = powerbi.embed($reportContainer.get(0), embedConfiguration);   
+				
+							
+							report.on('loaded', function(event){
+								report.getPages().then(function(pages)
+											{
+														var page = pages[0]
+										     page.getVisuals().then(function(visuals) {
+																console.log('PAGE');
+													      console.log(visuals);
+													 var cmpSlicer = visuals[3];
+													 
+													 cmpSlicer.getSlicerState().then(function(state){
+														 console.log(state);
+													 });
+				 
+																	 cmpSlicer.setSlicerState({
+														// filters:[test]
+													 });
+															});
+											});
+							});
+							
+        $reportContainer.height($("main").height() );
+						
+            },
+			complete:function(data){
+				$scope.loadingData = false;
+				console.log("complete");	
+			},  
+            error: function (e) {  
+				   console.log("Error:" + e.message)
+                alert("Error");  
+            }  
+        });  
+	
+
+	
+}
+
+
+  
+]]></client_script>
+        <controller_as>c</controller_as>
+        <css/>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description/>
+        <docs/>
+        <field_list/>
+        <has_preview>true</has_preview>
+        <id>rsp_sentinelone_security</id>
+        <internal>false</internal>
+        <link><![CDATA[function link(scope, element, attrs, controller) { 
+
+ }]]></link>
+        <name>RSP Sentinelone Security</name>
+        <option_schema/>
+        <public>false</public>
+        <roles/>
+        <script><![CDATA[(function() {
+  /* populate the 'data' object */
+  /* e.g., data.table = $sp.getValue('table'); */
+	
+	VisibleAccounts();
+	function VisibleAccounts()
+	{
+		console.log('ACCOUNTS::');
+		var vAccounts = [];		
+		var gr = new GlideRecord("x_68585_sentinel_x_68585_sentinelone_integration_table");
+	//	gr.addEncodedQuery("sys_domain!=global^ORsys_domain=NULL");
+	    //gr.addEncodedQuery("active=true");
+	
+		gr.query();		
+		if(!gs.getUser().hasRole('itil')){
+			while(gr.next()){
+				console.log(" CUSTOMERS:");
+				if(gs.getUser().getCompanyID() == gr.company){
+					 vAccounts.push(gr.getValue("sentinelone_account_id"));
+					 }			
+			
+			}
+		}
+		else
+			{
+				console.log('ITIL :');
+				var company = new GlideRecord('x_68585_sentinel_x_68585_sentinelone_integration_table');
+				//company.addEncodedQuery("u_account_managerISNOTEMPTY^active=true");
+				company.query();
+				//company.get(gs.getUser().getCompanyID());
+				while(company.next()){
+					vAccounts.push(company.getValue('sentinelone_account_id'));
+				}				
+				//vAccounts.push(company.getValue('sys_id'));
+				
+			}
+		data.vAccounts = vAccounts;
+		console.log(vAccounts);
+		return gr.getRowCount();
+	}
+	
+
+})();]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>Mohammad.Ahmed@mindshift.com</sys_created_by>
+        <sys_created_on>2020-10-05 14:47:25</sys_created_on>
+        <sys_customer_update>false</sys_customer_update>
+        <sys_id>02e692a3db6b9cd07fae62cb1396197f</sys_id>
+        <sys_mod_count>31</sys_mod_count>
+        <sys_name>RSP Sentinelone Security</sys_name>
+        <sys_package display_value="Ricoh Service Portal" source="x_mst_ricoh_servic">a8342b65dbaefb0063599017db961909</sys_package>
+        <sys_policy/>
+        <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+        <sys_scope display_value="Ricoh Service Portal">a8342b65dbaefb0063599017db961909</sys_scope>
+        <sys_update_name>sp_widget_02e692a3db6b9cd07fae62cb1396197f</sys_update_name>
+        <sys_updated_by>Mohammad.Ahmed@mindshift.com</sys_updated_by>
+        <sys_updated_on>2020-10-15 12:49:04</sys_updated_on>
+        <template><![CDATA[<div class="alert alert-info" ng-if="loadingData">
+  <fa name="spinner" spin="true"></fa>  Loading Reports...
+</div>
+<div id="reportContainer"></div>
+]]></template>
+    </sp_widget>
+</record_update>
