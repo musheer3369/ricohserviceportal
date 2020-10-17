@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?><record_update table="sp_widget">
     <sp_widget action="INSERT_OR_UPDATE">
         <category>custom</category>
-        <client_script><![CDATA[
-function($scope) {
+        <client_script><![CDATA[function($scope) {
   /* widget controller */
   var c = this;
 	 var models = window['powerbi-client'].models;    
@@ -20,6 +19,18 @@ var relativeDateFilter = {
   includeToday: true,
   filterType: models.FilterType.RelativeDate
 };	
+	
+	
+		 var  initialFilter ={};	
+	  initialFilter = {	$schema: "http://powerbi.com/product/schema#basic",
+				target: {
+				table: "tbl_SNOW_core_company",
+				column: "name"
+								},
+				 operator: "In",
+					values: [c.data.companyName],filterType:1
+				}
+	
 	 var  companyFilter ={};	
 	  companyFilter = {	$schema: "http://powerbi.com/product/schema#basic",
 				target: {
@@ -31,7 +42,7 @@ var relativeDateFilter = {
 				}
 		//ed31367fdb8e320060c6790aaf961987
 		
-var slicers = 
+var dateSlicer = 
   {
     selector: {
       $schema: "http://powerbi.com/product/schema#visualSelector",
@@ -54,14 +65,14 @@ var slicers =
   }
 ;
 	
-var slicers2 = 
+var initialSlicer = 
   {
     selector: {
       $schema: "http://powerbi.com/product/schema#visualSelector",		
       visualName: "fbc7579f0ca7002c0d84"
     },
     state: {
-      filters: [companyFilter]
+      filters: [initialFilter]
     }
   }
 ;
@@ -75,14 +86,13 @@ var slicers2 =
 							beforeSend:function(){
 								$scope.loadingData = true;
 							},
-            success: function (json) {  
-						//console.log(json);               
+            success: function (json) {  						         
                 var embedConfiguration = {  
                     type: 'report',  
 									pageName:"ReportSection",
                     id: json.ReportId,						
                     embedUrl: json.EmbedUrl,							
-                    slicers:[companySlicer],
+                    slicers:[dateSlicer,companySlicer],
                     tokenType: models.TokenType.Embed,  
                     accessToken: json.EmbedToken  ,
 			settings:{
@@ -110,31 +120,34 @@ var slicers2 =
 		
 		
 		report.getFilters().then(function(filters){
-			console.log("FILTERS");
-			console.log(filters);
+			//console.log("FILTERS");
+		//	console.log(filters);
 		});
-	report.getPages().then(function (pages) {
-			console.log("PAGES")
+		
+		
+	report.getPages().then(function (pages) {	
 			pages[0].setActive();
-			var activePage = pages.filter(function (page) {
-				console.log(page);
+			var activePage = pages.filter(function (page) {			
             return page.isActive;
         })[0];
    activePage.getVisuals()
 							 .then(function(visuals){
-		 console.log("VISUALS");
-				console.log(visuals);	
+	//	console.log("VISUALS");
+			//	console.log(visuals);			 
 				 var slicer = visuals.filter(function (visual) {
                   //  return visual.type == "slicer" && visual.name == "f9f1159ca1d3e4d572a0";
 											return visual.type == "slicer" && visual.name ==	 "fbc7579f0ca7002c0d84";
                 })[0];
-				console.log(slicer);
+		 
+			//	console.log(slicer);
 				slicer.getSlicerState()
 							.then(function(state){
-					console.log(state);
+				//	console.log(state);
 				})				
-				slicer.setFilters([companyFilter])
-			
+			//	slicer.setFilters([companyFilter])
+				slicer.setSlicerState({
+					filters:[]
+				});		 		
 			});
 		});
 
@@ -160,6 +173,11 @@ var slicers2 =
         <script><![CDATA[(function() {
   /* populate the 'data' object */
   /* e.g., data.table = $sp.getValue('table'); */
+		var company = new GlideRecord('core_company');
+				company.get(gs.getUser().getCompanyID());
+	
+	data.companyName = company.name;
+	console.log(data.companyName);
 	
 	VisibleAccounts();
 	function VisibleAccounts()
@@ -178,12 +196,18 @@ var slicers2 =
 		}
 		else
 			{
+			//	var company = new GlideRecord('core_company');
+			//	company.get(gs.getUser().getCompanyID());
 				var company = new GlideRecord('core_company');
-				company.get(gs.getUser().getCompanyID());
-				
+				company.addEncodedQuery("active=true^u_account_managerISNOTEMPTY^u_billing_authority=MINDSHIFT");
+				company.query();
+				//company.get(gs.getUser().getCompanyID());
+				while(company.next()){
+					vAccounts.push(company.getValue('name'));
+				}
 				
 				//vAccounts.push(company.getValue('sys_id'));
-				vAccounts.push(company.getValue('name'));
+			//	vAccounts.push(company.getValue('name'));
 				
 			}
 		data.vAccounts = vAccounts;
@@ -199,7 +223,7 @@ var slicers2 =
         <sys_created_on>2019-07-10 05:56:15</sys_created_on>
         <sys_customer_update>false</sys_customer_update>
         <sys_id>c80567e5dbaefb0063599017db9619b1</sys_id>
-        <sys_mod_count>193</sys_mod_count>
+        <sys_mod_count>233</sys_mod_count>
         <sys_name>RSP Power Bi Dashboard</sys_name>
         <sys_package display_value="Ricoh Service Portal" source="x_mst_ricoh_servic">a8342b65dbaefb0063599017db961909</sys_package>
         <sys_policy/>
@@ -207,7 +231,7 @@ var slicers2 =
         <sys_scope display_value="Ricoh Service Portal">a8342b65dbaefb0063599017db961909</sys_scope>
         <sys_update_name>sp_widget_c80567e5dbaefb0063599017db9619b1</sys_update_name>
         <sys_updated_by>Mohammad.Ahmed@mindshift.com</sys_updated_by>
-        <sys_updated_on>2020-01-16 05:38:57</sys_updated_on>
+        <sys_updated_on>2020-02-05 05:34:52</sys_updated_on>
         <template><![CDATA[<div class="alert alert-info" ng-if="loadingData">
   <fa name="spinner" spin="true"></fa>  Loading Reports...
 </div>
